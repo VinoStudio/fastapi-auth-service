@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: postgres
+    hostname: postgres
+    image: postgres:15
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  pgadmin:
+    container_name: pg_admin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - 5433:80
+    depends_on:
+      - db
+
+  redis:
+    image: redis
+    container_name: redis-academic
+    hostname: redis
+    restart: always
+    ports:
+      - 6379:6379
+
+  redis-commander:
+    image: rediscommander/redis-commander
+    container_name: redis-commander
+    hostname: redis-commander
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=password
+      - REDIS_DB=0
+    depends_on:
+      - redis
+
+  test_db:
+    image: postgres:15
+    container_name: postgres_test
+    hostname: postgres_test
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres_test
+      - POSTGRES_PASSWORD=postgres_test
+      - POSTGRES_DB=postgres_test
+    ports:
+      - 5434:5432
+    volumes:
+      - postgres_test:/var/lib/postgresql/data
+
+
+
+volumes:
+  postgres_data:
+  postgres_test:
